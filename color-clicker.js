@@ -1,8 +1,10 @@
 (function($) {
   var ColorClicker = function(element, options) {
     this.element = $(element);
-
-    this.defaults = {};
+    this.defaults = {
+      onInit: function(){},
+      onChange: function(){}
+    };
 
     // Combine options with defaults
     this.options = $.extend({}, this.defaults, options);
@@ -21,73 +23,99 @@
     _init: function(){
       this.element.addClass('color-clicker');
       this.element.on('click', $.proxy(this._changeColors, this)).click();
+
+      this.options.onInit(this.element);
     },
 
     _changeColors: function(e) {
-      this._setColor();
+      this.setColor();
+    },
 
+    _applyChange: function(e) {
       this.element.css('background', this.color);
       this.element.css('color', invertColor(this.color));
       this.element.html('<span>Current color = ' + this.color + '</span>');
+
+      this.options.onChange(this.element);
     },
 
-    _setColor: function(){
+    setColor: function(color){
       if(this.colors) {
         if(this.color) this.colors.unshift(this.color);
-        this.color = this.colors.pop();
+        this.color = color ? color : this.colors.pop();
       } else {
-        this.color = randomColor();
+        this.color = color ? color : randomColor();
       }
+
+      this._applyChange();
     },
 
     getColor: function() {
-      return this.colors;
+      return this.color;
     }
-  }
-
-  $.fn.colorClicker = function(options){
-    return this.each(function(){
-      new ColorClicker(this, options);
-    });
   }
 
   function generateColorHex(components) {
     var color = '#';
-
     $.each(components, function(index, value){
       if(value < 16) color += '0'
       color += value.toString(16);
     });
-
     return color; 
   }
 
   function extractComponents(color) {
     var components = [];
     var initIndex = (color[0] == '#') ? 1 : 0;
-
     for(i = initIndex; i < 6; i += 2) {
       components.push(parseInt(color.substring(i, i + 2), 16));
     }
-
     return components;
   }
 
   function randomColor() {
     var components = [];
-
     for(i = 0; i < 3; i++){
       components.push(Math.floor(Math.random() * 256));
     }
-
     return generateColorHex(components);
   }
+
 
   function invertColor(color) {
     var inverseComponents = $.map(extractComponents(color), function(value, index){
       return 255 - value;
     });
-
     return generateColorHex(inverseComponents);
+  }
+
+
+
+  $.fn.colorClicker = function(options){
+    var args = Array.apply(null, arguments);
+    //remove method name
+    args.shift();
+    var returnValue;
+
+    this.each(function(){
+      var data;
+      // Stores the plugin data so it can be accessed later
+      if(!options || (typeof(options) == 'object')) {
+        // initialize plugin
+        $(this).data('color-clicker', new ColorClicker(this, options));
+      } else if(typeof(options) == 'string') {
+        // Try to access plugin methods
+        data = $(this).data('color-clicker');
+
+        if(data && data[options] &&
+           (typeof(data[options]) == 'function')) {
+          // Call method
+          returnValue = data[options].apply(data, args);
+          return
+        }
+      }
+    });
+
+    return returnValue ? returnValue : this
   }
 }(jQuery));
