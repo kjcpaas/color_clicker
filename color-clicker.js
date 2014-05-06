@@ -1,17 +1,17 @@
 (function($) {
   $.fn.colorClicker = function(){
-    var element = $(this);
+    return this.each(function(){
+      element = $(this);
+      element.addClass('color-clicker');
 
-    element.on('click', function() {
-      bgColor = randomColor();
+      element.on('click', function() {
+        bgColor = randomColor();
 
-      element.css('background', bgColor);
-      element.css('color', invertColor(bgColor));
-      element.text('Current color = ' + bgColor);
-    }).click();
-
-    // For chaining
-    return element;
+        $(this).css('background', bgColor);
+        $(this).css('color', invertColor(bgColor));
+        $(this).html('<span>Current color = ' + bgColor + '</span>');
+      }).click();
+    });
   }
 
   function randomColor() {
