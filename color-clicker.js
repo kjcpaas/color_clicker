@@ -38,6 +38,10 @@
       } else {
         this.color = randomColor();
       }
+    },
+
+    getColor: function() {
+      return this.colors;
     }
   }
 
