@@ -2,3 +2,8 @@ body {
   font-family: "Arial" sans-serif;
   font-size: 28;
 }
+
+div {
+  height: 100px;
+  margin: 15px;
+}
