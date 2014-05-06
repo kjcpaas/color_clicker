@@ -10,12 +10,24 @@
   </head>
 
   <body>
-    <div></div>
-    <div></div>
-    <div></div>
+    <div class='has-clicker'></div>
+    <div class='has-clicker'></div>
+    <div class='has-clicker'></div>
+
+    <table>
+      <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+      </tr>
+    </table>
   </body>
 
   <script>
-    $('body > div').colorClicker();
+    $('.has-clicker').colorClicker();
+    $('table td').colorClicker({
+      colors: ['#000000', '#ffffff', '#0000ff', '#00ff00', '#ff0000']
+    });
   </script>
 </html>

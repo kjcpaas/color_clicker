@@ -3,7 +3,15 @@ body {
   font-size: 28;
 }
 
-body > div {
+.has-clicker {
   margin: 15px;
   padding: 40px 0px;
+}
+
+table {
+  margin: 0 15px;
+}
+
+td {
+  padding: 20px 10px;
 }
