@@ -2,8 +2,10 @@
   var ColorClicker = function(element, options) {
     this.element = $(element);
     this.defaults = {
+      // Callbacks
       onInit: function(){},
-      onChange: function(){}
+      onChange: function(){},
+      onDestroy: function(){}
     };
 
     // Combine options with defaults
@@ -21,8 +23,13 @@
     constructor: ColorClicker,
 
     _init: function(){
-      this.element.addClass('color-clicker');
-      this.element.on('click', $.proxy(this._changeColors, this)).click();
+      this.oldBgColor = this.element.css('background');
+      this.oldHtml = this.element.html();
+      this.oldTextColor = this.element.css('color');
+
+      this.element.addClass('color-clicker')
+      // Attach callback. Use proxy because else the this will be the clicked element, not the ClockClicker instance.
+                  .on('click', $.proxy(this._changeColors, this)).click();
 
       this.options.onInit(this.element);
     },
@@ -32,21 +39,30 @@
     },
 
     _applyChange: function(e) {
-      this.element.css('background', this.color);
-      this.element.css('color', invertColor(this.color));
-      this.element.html('<span>Current color = ' + this.color + '</span>');
-
+      this.element.css('background', this.color)
+                  .css('color', invertColor(this.color))
+                  .html('<span>Current color = ' + this.color + '</span>');
       this.options.onChange(this.element);
+    },
+
+    destroy: function() {
+      // Cleaning up
+      this.options.onDestroy(this.element);
+      this.element.css('background', this.oldBgColor)
+                  .css('color', this.oldTextColor)
+                  .html(this.oldHtml)
+                  .removeClass('color-clicker')
+                  .off('click');
     },
 
     setColor: function(color){
       if(this.colors) {
-        if(this.color) this.colors.unshift(this.color);
+        if(this.options.colors.indexOf(this.color) > -1)
+          this.colors.unshift(this.color);
         this.color = color ? color : this.colors.pop();
       } else {
         this.color = color ? color : randomColor();
       }
-
       this._applyChange();
     },
 
@@ -101,7 +117,8 @@
       var data;
       // Stores the plugin data so it can be accessed later
       if(!options || (typeof(options) == 'object')) {
-        // initialize plugin
+        // initialize plugin;
+        if(data = $(this).data('color-clicker')) data.destroy();
         $(this).data('color-clicker', new ColorClicker(this, options));
       } else if(typeof(options) == 'string') {
         // Try to access plugin methods
@@ -111,11 +128,10 @@
            (typeof(data[options]) == 'function')) {
           // Call method
           returnValue = data[options].apply(data, args);
-          return
         }
       }
     });
 
-    return returnValue ? returnValue : this
+    return returnValue ? returnValue : this;
   }
 }(jQuery));
