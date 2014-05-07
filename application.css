@@ -1,19 +1,27 @@
 body {
   font-family: "Arial" sans-serif;
   font-size: 28;
+  margin: 15px;
 }
 
 .has-clicker {
-  margin: 15px;
-  padding: 40px 0px;
+  padding: 30px 0px;
+  margin: 15px 0px;
 }
 
 table {
   width: 100%;
-  padding: 0 15px;
 }
 
 td {
   width: 25%;
   height: 75px;
+}
+
+p {
+  font-size: 20px;
+}
+
+h6 {
+  margin: 10px 0px;
 }
